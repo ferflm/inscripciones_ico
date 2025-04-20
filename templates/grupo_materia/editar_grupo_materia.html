@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Grupo-Materia</title>
+</head>
+<body>
+    <h1>Editar Grupo-Materia</h1>
+    <form id="grupoMateriaForm">
+        <label for="grupos">Grupo:</label>
+        <select id="grupos" required></select><br>
+
+        <label for="materias">Materia:</label>
+        <select id="materias" required></select><br>
+
+        <label for="profesores">Profesor:</label>
+        <select id="profesores">
+            <option value="">-- Ninguno --</option>
+        </select><br>
+
+        <label for="cupo_maximo">Cupo máximo:</label>
+        <input type="number" id="cupo_maximo" required><br>
+
+        <button type="submit">Guardar cambios</button>
+    </form>
+
+    <script>
+        const grupoMateriaId = window.location.pathname.split("/").slice(-2, -1)[0];
+        const form = document.getElementById("grupoMateriaForm");
+        const gruposSelect = document.getElementById("grupos");
+        const materiasSelect = document.getElementById("materias");
+        const profesoresSelect = document.getElementById("profesores");
+
+        async function cargarDatosFormulario() {
+            const datos = await fetch("/grupo_materia/datos_formulario").then(r => r.json());
+
+            datos.grupos.forEach(g => {
+                const option = document.createElement("option");
+                option.value = g.id_grupo;
+                option.textContent = g.clave_grupo;
+                gruposSelect.appendChild(option);
+            });
+
+            datos.materias.forEach(m => {
+                const option = document.createElement("option");
+                option.value = m.id_materia;
+                option.textContent = m.nombre;
+                materiasSelect.appendChild(option);
+            });
+
+            datos.profesores.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p.id_profesor;
+                option.textContent = p.nombre_completo;
+                profesoresSelect.appendChild(option);
+            });
+        }
+
+        async function cargarDatosGrupoMateria() {
+            const datos = await fetch(`/grupo_materia/${grupoMateriaId}`).then(r => r.json());
+            document.getElementById("cupo_maximo").value = datos.cupo_maximo;
+            gruposSelect.value = datos.id_grupo;
+            materiasSelect.value = datos.id_materia;
+            if (datos.id_profesor) {
+                profesoresSelect.value = datos.id_profesor;
+            }
+        }
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const datos = {
+                id_grupo: gruposSelect.value,
+                id_materia: materiasSelect.value,
+                id_profesor: profesoresSelect.value || null,
+                cupo_maximo: document.getElementById("cupo_maximo").value
+            };
+
+            try {
+                const respuesta = await fetch(`/grupo_materia/${grupoMateriaId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                const resultado = await respuesta.json();
+                alert(resultado.mensaje);
+                window.location.href = "/grupo_materia/listar";
+            } catch (error) {
+                console.error("Error al actualizar:", error);
+                alert("Error al actualizar el registro.");
+            }
+        });
+
+        cargarDatosFormulario().then(cargarDatosGrupoMateria);
+    </script>
+</body>
+</html>

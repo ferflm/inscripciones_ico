@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Grupo</title>
+</head>
+<body>
+    <h1>Editar Grupo</h1>
+    <form id="formGrupo">
+        <label>Clave del grupo:</label><br>
+        <input type="text" name="clave_grupo" required><br>
+
+        <label>Semestre:</label><br>
+        <input type="number" name="semestre" required><br>
+
+        <button type="submit">Actualizar</button>
+    </form>
+
+    <script>
+        const id = {{ id_grupo }};
+        fetch(`/api/grupos`)
+            .then(res => res.json())
+            .then(data => {
+                const grupo = data.find(g => g.id_grupo === id);
+                if (grupo) {
+                    const form = document.getElementById("formGrupo");
+                    form.clave_grupo.value = grupo.clave_grupo;
+                    form.semestre.value = grupo.semestre;
+                }
+            });
+
+        document.getElementById("formGrupo").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                clave_grupo: form.clave_grupo.value,
+                semestre: parseInt(form.semestre.value)
+            };
+
+            fetch(`/grupos/${id}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(res => {
+                if (res.ok) {
+                    window.location.href = "/grupos";
+                } else {
+                    alert("Error al actualizar el grupo.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

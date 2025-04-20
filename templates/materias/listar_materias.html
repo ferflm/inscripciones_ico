@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Materias</title>
+</head>
+<body>
+    <h1>Materias</h1>
+    <a href="/materias/crear">Agregar nueva materia</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Clave</th>
+                <th>Nombre</th>
+                <th>Créditos</th>
+                <th>Laboratorio</th>
+                <th>Optativa</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for materia in materias %}
+            <tr>
+                <td>{{ materia.id_materia }}</td>
+                <td>{{ materia.clave_materia }}</td>
+                <td>{{ materia.nombre }}</td>
+                <td>{{ materia.creditos }}</td>
+                <td>{{ 'Sí' if materia.requiere_lab else 'No' }}</td>
+                <td>{{ 'Sí' if materia.es_optativa else 'No' }}</td>
+                <td>
+                    <a href="/materias/{{ materia.id_materia }}/editar">Editar</a>
+                    <button onclick="eliminarMateria({{ materia.id_materia }})">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function eliminarMateria(id) {
+            if (confirm("¿Estás seguro de eliminar esta materia?")) {
+                fetch(`/materias/${id}`, {
+                    method: 'DELETE'
+                }).then(res => {
+                    if (res.ok) {
+                        location.reload();
+                    } else {
+                        alert("Error al eliminar la materia.");
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

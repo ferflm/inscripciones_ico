@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Grupo-Materia</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const gruposSelect = document.getElementById("id_grupo");
+            const materiasSelect = document.getElementById("id_materia");
+            const profesoresSelect = document.getElementById("id_profesor");
+
+            try {
+                const response = await fetch("/grupo_materia/datos_formulario");
+                const data = await response.json();
+
+                // Llenar grupos
+                data.grupos.forEach(grupo => {
+                    const option = document.createElement("option");
+                    option.value = grupo.id_grupo;
+                    option.textContent = grupo.clave_grupo;
+                    gruposSelect.appendChild(option);
+                });
+
+                // Llenar materias
+                data.materias.forEach(materia => {
+                    const option = document.createElement("option");
+                    option.value = materia.id_materia;
+                    option.textContent = materia.nombre;
+                    materiasSelect.appendChild(option);
+                });
+
+                // Llenar profesores
+                const opcionVacia = document.createElement("option");
+                opcionVacia.value = "";
+                opcionVacia.textContent = "Sin profesor asignado";
+                profesoresSelect.appendChild(opcionVacia);
+
+                data.profesores.forEach(profesor => {
+                    const option = document.createElement("option");
+                    option.value = profesor.id_profesor;
+                    option.textContent = profesor.nombre_completo;
+                    profesoresSelect.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error("Error cargando datos del formulario:", error);
+            }
+
+            // Manejador del formulario
+            const form = document.getElementById("form_grupo_materia");
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const datos = {
+                    id_grupo: gruposSelect.value,
+                    id_materia: materiasSelect.value,
+                    id_profesor: profesoresSelect.value || null,
+                    cupo_maximo: document.getElementById("cupo_maximo").value
+                };
+
+                try {
+                    const respuesta = await fetch("/grupo_materia", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(datos)
+                    });
+
+                    const resultado = await respuesta.json();
+                    alert(resultado.mensaje);
+                    window.location.href = "/grupo_materia/listar";
+                } catch (error) {
+                    console.error("Error al enviar formulario:", error);
+                    alert("Error al guardar el registro.");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Agregar Grupo-Materia</h1>
+    <form id="form_grupo_materia">
+        <label for="id_grupo">Grupo:</label>
+        <select id="id_grupo" name="id_grupo" required></select><br><br>
+
+        <label for="id_materia">Materia:</label>
+        <select id="id_materia" name="id_materia" required></select><br><br>
+
+        <label for="id_profesor">Profesor:</label>
+        <select id="id_profesor" name="id_profesor"></select><br><br>
+
+        <label for="cupo_maximo">Cupo máximo:</label>
+        <input type="number" id="cupo_maximo" name="cupo_maximo" min="1" required><br><br>
+
+        <button type="submit">Guardar</button>
+    </form>
+</body>
+</html>

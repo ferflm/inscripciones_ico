@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Grupos</title>
+</head>
+<body>
+    <h1>Grupos</h1>
+    <a href="/grupos/crear">Agregar nuevo grupo</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Clave</th>
+                <th>Semestre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grupo in grupos %}
+            <tr>
+                <td>{{ grupo.id_grupo }}</td>
+                <td>{{ grupo.clave_grupo }}</td>
+                <td>{{ grupo.semestre }}</td>
+                <td>
+                    <a href="/grupos/{{ grupo.id_grupo }}/editar">Editar</a>
+                    <button onclick="eliminarGrupo({{ grupo.id_grupo }})">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function eliminarGrupo(id) {
+            if (confirm("¿Estás seguro de eliminar este grupo?")) {
+                fetch(`/grupos/${id}`, {
+                    method: 'DELETE'
+                }).then(res => {
+                    if (res.ok) {
+                        location.reload();
+                    } else {
+                        alert("Error al eliminar el grupo.");
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

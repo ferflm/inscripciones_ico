@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Materia</title>
+</head>
+<body>
+    <h1>Editar Materia</h1>
+    <form id="formMateria">
+        <label>Clave:</label><br>
+        <input type="text" name="clave_materia" required><br>
+
+        <label>Nombre:</label><br>
+        <input type="text" name="nombre" required><br>
+
+        <label>Créditos:</label><br>
+        <input type="number" name="creditos" required><br>
+
+        <label>¿Requiere laboratorio?</label><br>
+        <input type="checkbox" name="requiere_lab"><br>
+
+        <label>¿Es optativa?</label><br>
+        <input type="checkbox" name="es_optativa"><br>
+
+        <button type="submit">Actualizar</button>
+    </form>
+
+    <script>
+        const id = {{ id_materia }};
+        fetch(`/api/materias`)
+            .then(res => res.json())
+            .then(data => {
+                const materia = data.find(m => m.id_materia === id);
+                if (materia) {
+                    const form = document.getElementById("formMateria");
+                    form.clave_materia.value = materia.clave_materia;
+                    form.nombre.value = materia.nombre;
+                    form.creditos.value = materia.creditos;
+                    form.requiere_lab.checked = materia.requiere_lab;
+                    form.es_optativa.checked = materia.es_optativa;
+                }
+            });
+
+        document.getElementById("formMateria").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                clave_materia: form.clave_materia.value,
+                nombre: form.nombre.value,
+                creditos: parseInt(form.creditos.value),
+                requiere_lab: form.requiere_lab.checked,
+                es_optativa: form.es_optativa.checked
+            };
+
+            fetch(`/materias/${id}`, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }).then(res => {
+                if (res.ok) {
+                    window.location.href = "/materias";
+                } else {
+                    alert("Error al actualizar la materia.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

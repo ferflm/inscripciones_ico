@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Grupo-Materia</title>
+</head>
+<body>
+    <h1>Grupo-Materia</h1>
+    <a href="/grupo_materia/crear">Agregar nuevo grupo-materia</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Grupo</th>
+                <th>Materia</th>
+                <th>Profesor</th>
+                <th>Cupo Máximo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros %}
+            <tr>
+                <td>{{ registro.id_grupo_materia }}</td>
+                <td>{{ registro.clave_grupo }}</td>
+                <td>{{ registro.nombre_materia }}</td>
+                <td>
+                    {% if registro.nombre_profesor %}
+                        {{ registro.nombre_profesor }}
+                    {% else %}
+                        Sin asignar
+                    {% endif %}
+                </td>
+                <td>{{ registro.cupo_maximo }}</td>
+                <td>
+                    <a href="/grupo_materia/{{ registro.id_grupo_materia }}/editar">Editar</a>
+                    <button onclick="eliminarGrupoMateria({{ registro.id_grupo_materia }})">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function eliminarGrupoMateria(id) {
+            if (confirm("¿Estás seguro de eliminar este grupo-materia?")) {
+                fetch(`/grupo_materia/${id}`, {
+                    method: 'DELETE'
+                }).then(res => {
+                    if (res.ok) {
+                        location.reload();
+                    } else {
+                        alert("Error al eliminar el registro.");
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,10 +1,35 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from models.conexion import obtener_conexion
 
-grupos_bp = Blueprint('grupos', __name__)
+grupos_bp = Blueprint('grupos', __name__, template_folder='../templates')
 
-# GET: Listar todos los grupos
-@grupos_bp.route('/grupos', methods=['GET'])
+# -----------------------
+# Rutas HTML (Frontend)
+# -----------------------
+
+@grupos_bp.route('/grupos')
+def vista_listar_grupos():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM grupo")
+    grupos = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+    return render_template('grupos/listar_grupos.html', grupos=grupos)
+
+@grupos_bp.route('/grupos/crear')
+def vista_crear_grupo():
+    return render_template('grupos/agregar_grupo.html')
+
+@grupos_bp.route('/grupos/<int:id_grupo>/editar')
+def vista_editar_grupo(id_grupo):
+    return render_template('grupos/editar_grupo.html', id_grupo=id_grupo)
+
+# -----------------------
+# API REST (JSON)
+# -----------------------
+
+@grupos_bp.route('/api/grupos', methods=['GET'])
 def listar_grupos():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
@@ -14,7 +39,6 @@ def listar_grupos():
     conexion.close()
     return jsonify(grupos)
 
-# POST: Agregar un nuevo grupo
 @grupos_bp.route('/grupos', methods=['POST'])
 def agregar_grupo():
     datos = request.json
@@ -29,7 +53,6 @@ def agregar_grupo():
     conexion.close()
     return jsonify({'mensaje': 'Grupo agregado exitosamente'}), 201
 
-# PUT: Actualizar grupo
 @grupos_bp.route('/grupos/<int:id_grupo>', methods=['PUT'])
 def actualizar_grupo(id_grupo):
     datos = request.json
@@ -44,7 +67,6 @@ def actualizar_grupo(id_grupo):
     conexion.close()
     return jsonify({'mensaje': 'Grupo actualizado correctamente'})
 
-# DELETE: Eliminar grupo
 @grupos_bp.route('/grupos/<int:id_grupo>', methods=['DELETE'])
 def eliminar_grupo(id_grupo):
     conexion = obtener_conexion()
