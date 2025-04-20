@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Profesor</title>
+</head>
+<body>
+    <h1>Editar Profesor</h1>
+    <form id="formularioProfesor">
+        <input type="text" name="numero_trabajador" placeholder="Número Trabajador" required><br>
+        <input type="text" name="nombre" placeholder="Nombre" required><br>
+        <input type="text" name="a_paterno" placeholder="Apellido Paterno" required><br>
+        <input type="text" name="a_materno" placeholder="Apellido Materno" required><br>
+        <input type="email" name="correo" placeholder="Correo" required><br>
+        <input type="text" name="rfc" placeholder="RFC" required><br>
+        <button type="submit">Guardar cambios</button>
+    </form>
+
+    <script>
+        const id = window.location.pathname.split('/')[2];
+        const formulario = document.getElementById('formularioProfesor');
+
+        fetch(`/profesores/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                for (let campo in data) {
+                    if (formulario[campo]) formulario[campo].value = data[campo];
+                }
+            });
+
+        formulario.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(this).entries());
+            const respuesta = await fetch(`/profesores/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            if (respuesta.ok) {
+                alert("Profesor actualizado");
+                window.location.href = "/profesores";
+            } else {
+                alert("Error al actualizar profesor");
+            }
+        });
+    </script>
+</body>
+</html>

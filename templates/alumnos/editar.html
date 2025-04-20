@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Alumno</title>
+</head>
+<body>
+    <h1>Editar Alumno</h1>
+    <form id="form-editar-alumno">
+        <input type="hidden" id="id_alumno" value="{{ alumno.id_alumno }}">
+        <label>Número de Cuenta: <input type="text" id="numero_cuenta" value="{{ alumno.numero_cuenta }}"></label><br>
+        <label>Nombre: <input type="text" id="nombre" value="{{ alumno.nombre }}"></label><br>
+        <label>Apellido Paterno: <input type="text" id="a_paterno" value="{{ alumno.a_paterno }}"></label><br>
+        <label>Apellido Materno: <input type="text" id="a_materno" value="{{ alumno.a_materno }}"></label><br>
+        <label>Correo: <input type="email" id="correo" value="{{ alumno.correo }}"></label><br>
+        <label>Contraseña: <input type="password" id="contrasena" value="{{ alumno.contrasena }}"></label><br>
+        <button type="submit">Guardar Cambios</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('form-editar-alumno');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('id_alumno').value;
+
+            const data = {
+                numero_cuenta: document.getElementById('numero_cuenta').value,
+                nombre: document.getElementById('nombre').value,
+                a_paterno: document.getElementById('a_paterno').value,
+                a_materno: document.getElementById('a_materno').value,
+                correo: document.getElementById('correo').value,
+                contrasena: document.getElementById('contrasena').value
+            };
+
+            fetch(`/alumnos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(res => {
+                if (res.ok) {
+                    alert("Alumno actualizado");
+                    window.location.href = '/alumnos'; // redirige al listado
+                } else {
+                    alert("Error al actualizar");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

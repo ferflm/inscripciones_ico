@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Profesores</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+        }
+        button {
+            margin: 0 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Profesores</h1>
+    <button onclick="window.location.href='/profesores/crear'">Agregar Profesor</button>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Número Trabajador</th>
+                <th>Nombre</th>
+                <th>Apellido Paterno</th>
+                <th>Apellido Materno</th>
+                <th>Correo</th>
+                <th>RFC</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for profesor in profesores %}
+            <tr id="profesor-{{ profesor.id_profesor }}">
+                <td>{{ profesor.id_profesor }}</td>
+                <td>{{ profesor.numero_trabajador }}</td>
+                <td>{{ profesor.nombre }}</td>
+                <td>{{ profesor.a_paterno }}</td>
+                <td>{{ profesor.a_materno }}</td>
+                <td>{{ profesor.correo }}</td>
+                <td>{{ profesor.rfc }}</td>
+                <td>
+                    <button onclick="editarProfesor({{ profesor.id_profesor }})">Editar</button>
+                    <button onclick="eliminarProfesor({{ profesor.id_profesor }})">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function editarProfesor(id) {
+            window.location.href = `/profesores/${id}/editar`;
+        }
+
+        function eliminarProfesor(id) {
+            if (confirm("¿Estás seguro de que deseas eliminar este profesor?")) {
+                fetch(`/profesores/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(res => {
+                    if (res.ok) {
+                        document.getElementById(`profesor-${id}`).remove();
+                        alert("Profesor eliminado");
+                    } else {
+                        alert("Error al eliminar el profesor");
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

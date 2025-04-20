@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Alumno</title>
+</head>
+<body>
+    <h1>Agregar Nuevo Alumno</h1>
+    <form id="form-nuevo-alumno">
+        <label>Número de Cuenta: <input type="text" id="numero_cuenta"></label><br>
+        <label>Nombre: <input type="text" id="nombre"></label><br>
+        <label>Apellido Paterno: <input type="text" id="a_paterno"></label><br>
+        <label>Apellido Materno: <input type="text" id="a_materno"></label><br>
+        <label>Correo: <input type="email" id="correo"></label><br>
+        <label>Contraseña: <input type="password" id="contrasena"></label><br>
+        <button type="submit">Guardar</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('form-nuevo-alumno');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const data = {
+                numero_cuenta: document.getElementById('numero_cuenta').value,
+                nombre: document.getElementById('nombre').value,
+                a_paterno: document.getElementById('a_paterno').value,
+                a_materno: document.getElementById('a_materno').value,
+                correo: document.getElementById('correo').value,
+                contrasena: document.getElementById('contrasena').value
+            };
+
+            fetch('/alumnos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(res => {
+                if (res.ok) {
+                    alert("Alumno agregado correctamente");
+                    window.location.href = '/alumnos'; // Redirige al listado
+                } else {
+                    alert("Error al agregar alumno");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

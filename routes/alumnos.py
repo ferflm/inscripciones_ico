@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, render_template, request, jsonify
 from models.conexion import obtener_conexion
 
 alumnos_bp = Blueprint('alumnos', __name__)
@@ -12,7 +12,7 @@ def listar_alumnos():
     alumnos = cursor.fetchall()
     cursor.close()
     conexion.close()
-    return jsonify(alumnos)
+    return render_template('alumnos/listar.html', alumnos=alumnos)
 
 # GET: Obtener un alumno por ID
 @alumnos_bp.route('/alumnos/<int:id_alumno>', methods=['GET'])
@@ -82,3 +82,21 @@ def eliminar_alumno(id_alumno):
     except Exception as e:
         conexion.rollback()
         return jsonify({'error': str(e)}), 400
+
+@alumnos_bp.route('/alumnos/<int:id_alumno>/editar', methods=['GET'])
+def formulario_editar_alumno(id_alumno):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM alumno WHERE id_alumno = %s", (id_alumno,))
+    alumno = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    if alumno:
+        return render_template('alumnos/editar.html', alumno=alumno)
+    else:
+        return "Alumno no encontrado", 404
+    
+
+@alumnos_bp.route('/alumnos/nuevo', methods=['GET'])
+def formulario_crear_alumno():
+    return render_template('alumnos/agregar.html')

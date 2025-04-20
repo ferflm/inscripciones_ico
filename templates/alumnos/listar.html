@@ -1,14 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Alumnos</title>
+    <meta charset="UTF-8">
+    <title>Lista de Alumnos</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+        }
+        button {
+            margin: 0 2px;
+        }
+    </style>
 </head>
 <body>
     <h1>Lista de Alumnos</h1>
-    <ul>
-    {% for alumno in alumnos %}
-        <li>{{ alumno.nombre }} {{ alumno.a_paterno }} - {{ alumno.numero_cuenta }}</li>
-    {% endfor %}
-    </ul>
+    <a href="/alumnos/nuevo">
+        <button>Agregar Alumno</button>
+    </a>    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Número de Cuenta</th>
+                <th>Nombre</th>
+                <th>Apellido Paterno</th>
+                <th>Apellido Materno</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alumno in alumnos %}
+            <tr id="alumno-{{ alumno.id_alumno }}">
+                <td>{{ alumno.id_alumno }}</td>
+                <td>{{ alumno.numero_cuenta }}</td>
+                <td>{{ alumno.nombre }}</td>
+                <td>{{ alumno.a_paterno }}</td>
+                <td>{{ alumno.a_materno }}</td>
+                <td>{{ alumno.correo }}</td>
+                <td>
+                    <button onclick="editarAlumno({{ alumno.id_alumno }})">Editar</button>
+                    <button onclick="eliminarAlumno({{ alumno.id_alumno }})">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function editarAlumno(id) {
+            window.location.href = `/alumnos/${id}/editar`;
+        }
+
+        function eliminarAlumno(id) {
+            if (confirm("¿Estás seguro de que deseas eliminar este alumno?")) {
+                fetch(`/alumnos/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(res => {
+                    if (res.ok) {
+                        document.getElementById(`alumno-${id}`).remove();
+                        alert("Alumno eliminado");
+                    } else {
+                        alert("Error al eliminar el alumno");
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>
