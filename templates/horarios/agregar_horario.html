@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Horario</title>
+</head>
+<body>
+    <h1>Agregar Horario</h1>
+
+    <form id="form-horario">
+        <label for="grupo_materia">Grupo/Materia:</label>
+        <select id="grupo_materia" name="grupo_materia" required></select><br><br>
+
+        <label>Días:</label><br>
+        <label><input type="checkbox" name="dias" value="Lunes"> Lunes</label>
+        <label><input type="checkbox" name="dias" value="Martes"> Martes</label>
+        <label><input type="checkbox" name="dias" value="Miércoles"> Miércoles</label>
+        <label><input type="checkbox" name="dias" value="Jueves"> Jueves</label>
+        <label><input type="checkbox" name="dias" value="Viernes"> Viernes</label>
+        <label><input type="checkbox" name="dias" value="Sábado"> Sábado</label><br><br>
+
+        <label for="hora_inicio">Hora inicio:</label>
+        <input type="time" id="hora_inicio" name="hora_inicio" required><br><br>
+
+        <label for="hora_fin">Hora fin:</label>
+        <input type="time" id="hora_fin" name="hora_fin" required><br><br>
+
+        <label for="salon">Salón:</label>
+        <input type="text" id="salon" name="salon" required><br><br>
+
+        <button type="submit">Agregar Horario</button>
+    </form>
+
+    <script>
+        async function cargarOpcionesGrupoMateria() {
+            const res = await fetch('/grupo_materia/opciones');
+            const opciones = await res.json();
+            const select = document.getElementById('grupo_materia');
+
+            opciones.forEach(op => {
+                const option = document.createElement('option');
+                option.value = op.id;
+                option.textContent = op.texto;
+                select.appendChild(option);
+            });
+        }
+
+        document.getElementById('form-horario').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const id_grupo_materia = document.getElementById('grupo_materia').value;
+            const hora_inicio = document.getElementById('hora_inicio').value;
+            const hora_fin = document.getElementById('hora_fin').value;
+            const salon = document.getElementById('salon').value;
+
+            const diasSeleccionados = Array.from(document.querySelectorAll('input[name="dias"]:checked'))
+                                           .map(cb => cb.value);
+
+            for (const dia of diasSeleccionados) {
+                await fetch('/horarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_grupo_materia,
+                        dia,
+                        hora_inicio,
+                        hora_fin,
+                        salon
+                    })
+                });
+            }
+
+            alert('Horario agregado con éxito');
+            window.location.href = '/horarios/listar';
+        });
+
+        cargarOpcionesGrupoMateria();
+    </script>
+</body>
+</html>

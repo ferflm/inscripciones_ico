@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Horario</title>
+</head>
+<body>
+    <h1>Editar Horario</h1>
+
+    <form id="formulario-editar-horario">
+        <label for="grupo_materia">Materia y Grupo:</label>
+        <select id="grupo_materia" name="grupo_materia" required>
+            <!-- Opciones llenadas dinámicamente -->
+        </select>
+        <br><br>
+
+        <label for="dia">Día:</label>
+        <select id="dia" name="dia" required>
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sábado">Sábado</option>
+        </select>
+        <br><br>
+
+        <label for="hora_inicio">Hora de Inicio:</label>
+        <input type="time" id="hora_inicio" name="hora_inicio" required>
+        <br><br>
+
+        <label for="hora_fin">Hora de Fin:</label>
+        <input type="time" id="hora_fin" name="hora_fin" required>
+        <br><br>
+
+        <label for="salon">Salón:</label>
+        <input type="text" id="salon" name="salon" required>
+        <br><br>
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const idHorario = params.get('id');
+
+        async function cargarGrupoMateria() {
+            const res = await fetch('/grupo_materia/opciones');
+            const opciones = await res.json();
+            const select = document.getElementById('grupo_materia');
+
+            for (const opcion of opciones) {
+                const opt = document.createElement('option');
+                opt.value = opcion.id_grupo_materia;
+                opt.textContent = opcion.texto;
+                select.appendChild(opt);
+            }
+        }
+
+        async function cargarDatosHorario() {
+            const res = await fetch(`/horarios/${idHorario}`);
+            const horario = await res.json();
+
+            document.getElementById('grupo_materia').value = horario.id_grupo_materia;
+            document.getElementById('dia').value = horario.dia;
+            document.getElementById('hora_inicio').value = horario.hora_inicio;
+            document.getElementById('hora_fin').value = horario.hora_fin;
+            document.getElementById('salon').value = horario.salon;
+        }
+
+        document.getElementById('formulario-editar-horario').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const datos = {
+                id_grupo_materia: document.getElementById('grupo_materia').value,
+                dia: document.getElementById('dia').value,
+                hora_inicio: document.getElementById('hora_inicio').value,
+                hora_fin: document.getElementById('hora_fin').value,
+                salon: document.getElementById('salon').value
+            };
+
+            await fetch(`/horarios/${idHorario}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datos)
+            });
+
+            alert('Horario actualizado correctamente');
+            window.location.href = '/horarios/listar';
+        });
+
+        async function inicializar() {
+            await cargarGrupoMateria();
+            await cargarDatosHorario();
+        }
+
+        inicializar();
+    </script>
+</body>
+</html>

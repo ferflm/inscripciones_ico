@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Horarios</title>
+</head>
+<body>
+    <h1>Lista de Horarios</h1>
+    
+    <a href="/horarios/agregar">Agregar Horario</a>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Clave Materia</th>
+                <th>Materia</th>
+                <th>Grupo</th>
+                <th>Profesor</th>
+                <th>Día</th>
+                <th>Horas de Clase</th>
+                <th>Salón</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-horarios">
+            <!-- Se llena con JS -->
+        </tbody>
+    </table>
+
+    <script>
+        async function cargarHorarios() {
+            const res = await fetch('/horarios');
+            const horarios = await res.json();
+
+            const tabla = document.getElementById('tabla-horarios');
+            tabla.innerHTML = '';
+
+            for (const horario of horarios) {
+                const fila = document.createElement('tr');
+
+                fila.innerHTML = `
+                    <td>${horario.id_horario}</td>
+                    <td>${horario.clave_materia}</td>
+                    <td>${horario.nombre_materia}</td>
+                    <td>${horario.clave_grupo}</td>
+                    <td>${horario.profesor || 'No asignado'}</td>
+                    <td>${horario.dia}</td>
+                    <td>${horario.hora_inicio} - ${horario.hora_fin}</td>
+                    <td>${horario.salon}</td>
+                    <td>
+                        <a href="/horarios/editar?id=${horario.id_horario}">Editar</a>
+                        <button onclick="eliminarHorario(${horario.id_horario})">Eliminar</button>
+                    </td>
+                `;
+                tabla.appendChild(fila);
+            }
+        }
+
+        async function eliminarHorario(id) {
+            if (confirm('¿Estás seguro de eliminar este horario?')) {
+                await fetch(`/horarios/${id}`, { method: 'DELETE' });
+                cargarHorarios();
+            }
+        }
+
+        cargarHorarios();
+    </script>
+</body>
+</html>
